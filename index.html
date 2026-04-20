@@ -3,163 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legends of Auros - Character Vault</title>
+    <title>Legends of Auros - Definitive Vault</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Crimson Pro', serif; background-color: #1a1a1a; color: #333; }
-        .parchment { background: #fdf6e3; border: 10px double #2d2d2d; box-shadow: 0 0 30px rgba(0,0,0,0.7); }
-        .stat-header { background: #000; color: #fff; font-size: 0.7rem; font-weight: bold; text-align: center; padding: 2px; text-transform: uppercase; }
-        .input-underline { border-bottom: 1px solid #000; background: transparent; width: 100%; padding: 2px; }
-        .input-underline:focus { outline: none; background: #fffbeb; }
-        .stat-box { border: 2px solid #000; padding: 4px; text-align: center; background: white; }
+        body { font-family: 'Crimson Pro', serif; background-color: #1a1a1a; color: #111; }
+        .parchment { background: #fdf6e3; border: 15px double #2d2d2d; box-shadow: 0 0 50px rgba(0,0,0,0.9); position: relative; }
+        .stat-header { background: #000; color: #fff; font-size: 0.7rem; font-weight: 800; text-align: center; padding: 4px; text-transform: uppercase; letter-spacing: 1.5px; border: 1px solid #444; }
+        .input-fill { background: transparent; width: 100%; border-bottom: 1px solid rgba(0,0,0,0.2); font-weight: 700; text-align: center; }
+        .input-fill:focus { outline: none; border-bottom: 2px solid #000; background: #fff; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        th, td { border: 1px solid black; padding: 2px; font-size: 0.75rem; vertical-align: middle; }
+        th { background: #d1d5db; text-transform: uppercase; font-size: 0.65rem; }
+        .biaem-group { display: flex; gap: 2px; justify-content: center; align-items: center; }
+        .dot { width: 10px; height: 10px; border: 1px solid black; cursor: pointer; border-radius: 1px; }
+        .dot.filled { background: black; }
+        @media print { .no-print { display: none !important; } .parchment { border: none; width: 100%; margin: 0; } }
     </style>
 </head>
-<body class="p-2 md:p-8">
+<body class="p-4 md:p-10">
 
-    <div class="max-w-5xl mx-auto parchment p-4 md:p-8">
-        <div class="flex flex-wrap gap-2 mb-6 justify-center no-print">
-            <button onclick="generateRandom()" class="bg-indigo-800 text-white px-4 py-2 rounded font-bold">🎲 AUTO-ROLL NEW</button>
-            <button onclick="saveCharacter()" class="bg-green-800 text-white px-4 py-2 rounded font-bold">💾 SAVE DATA</button>
-            <button onclick="window.print()" class="bg-gray-800 text-white px-4 py-2 rounded font-bold">🖨️ PRINT SHEET</button>
+    <div class="max-w-6xl mx-auto parchment p-6 md:p-12 space-y-10">
+        
+        <div class="flex justify-between items-center no-print border-b-2 border-black pb-4 mb-6">
+            <h2 class="text-2xl font-black">LEGENDS OF AUROS</h2>
+            <div class="space-x-2">
+                <button onclick="saveVault()" class="bg-indigo-900 text-white px-4 py-2 font-bold rounded">💾 SAVE DATA</button>
+                <button onclick="window.print()" class="bg-black text-white px-4 py-2 font-bold rounded">🖨️ PRINT SHEET</button>
+            </div>
         </div>
 
-        <h1 class="text-4xl font-black text-center mb-6 tracking-tighter border-b-4 border-black pb-2">LEGENDS OF AUROS</h1>
+        <section class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="md:col-span-2 border-b-2 border-black">
+                <label class="text-[10px] font-black uppercase">Character Name</label>
+                <input id="name" class="text-3xl font-black w-full bg-transparent" placeholder="XARRUS">
+            </div>
+            <div class="border-b-2 border-black">
+                <label class="text-[10px] font-black uppercase">Race / Ancestry</label>
+                <input id="race_ancestry" class="text-xl font-bold w-full bg-transparent" placeholder="Dwarf / Ailguard">
+            </div>
+            <div class="border-b-2 border-black">
+                <label class="text-[10px] font-black uppercase">Social Status / Rank</label>
+                <input id="social_status" class="text-xl font-bold w-full bg-transparent" placeholder="Citizen / Soldier">
+            </div>
+        </section>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div><label class="block text-xs font-bold uppercase">Character Name</label><input id="name" type="text" class="input-underline text-xl font-bold" placeholder="Xarrus"></div>
-            <div><label class="block text-xs font-bold uppercase">Race / Ancestry</label><input id="race" type="text" class="input-underline" placeholder="Dwarf / Ailguard"></div>
-            <div><label class="block text-xs font-bold uppercase">Role</label><input id="role" type="text" class="input-underline" placeholder="Warrior"></div>
-            <div><label class="block text-xs font-bold uppercase">Level</label><input id="level" type="number" class="input-underline font-bold" value="10"></div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <div class="space-y-4">
-                <div class="stat-header">Attributes & Modifiers</div>
-                <div id="attr-list" class="space-y-2">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-3 space-y-6">
+                <div class="stat-header">Primary Attributes</div>
+                <div id="attribute-box" class="space-y-1">
                     </div>
 
-                <div class="stat-header mt-6">Combat Stats</div>
+                <div class="stat-header">Movement Rates</div>
                 <div class="grid grid-cols-2 gap-2">
-                    <div class="stat-box">
-                        <span class="block text-[10px] font-bold">INITIATIVE</span>
-                        <input id="init" type="text" class="text-xl font-bold w-full text-center" value="d8+4">
+                    <div class="stat-box border border-black p-1 text-center bg-white">
+                        <span class="text-[9px] font-bold">FULL / HALF</span>
+                        <input id="move_fh" class="font-black text-lg" value="66 / 33">
                     </div>
-                    <div class="stat-box">
-                        <span class="block text-[10px] font-bold">DEFENSE</span>
-                        <input id="defense" type="text" class="text-xl font-bold w-full text-center" value="10/12">
+                    <div class="stat-box border border-black p-1 text-center bg-white">
+                        <span class="text-[9px] font-bold">QTR / 5' / 1'</span>
+                        <input id="move_detail" class="font-black text-lg" value="17/5/1">
                     </div>
+                </div>
+
+                <div class="stat-header">Saving Throws</div>
+                <table class="bg-white">
+                    <tr><td>Paralyze</td><td><input class="w-8"></td></tr>
+                    <tr><td>Poison</td><td><input class="w-8"></td></tr>
+                    <tr><td>Breath</td><td><input class="w-8"></td></tr>
+                    <tr><td>Spell</td><td><input class="w-8"></td></tr>
+                </table>
+            </div>
+
+            <div class="lg:col-span-6 space-y-6">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="stat-box border-4 border-black p-4 text-center bg-white shadow-inner">
+                        <span class="text-xs font-black uppercase text-red-700">Health Points</span>
+                        <input id="hp_val" class="text-6xl font-black text-red-700" value="102">
+                    </div>
+                    <div class="stat-box border-4 border-black p-4 text-center bg-white shadow-inner">
+                        <span class="text-xs font-black uppercase text-blue-700">Mana / Favor</span>
+                        <input id="mana_val" class="text-6xl font-black text-blue-700" value="24">
+                    </div>
+                </div>
+
+                <div class="stat-header">Weapons / Magic Skills</div>
+                <table class="bg-white">
+                    <thead>
+                        <tr><th>Item / Spell</th><th>+Hit</th><th>Damage</th><th>+Dmg</th><th>Wt</th></tr>
+                    </thead>
+                    <tbody id="weapon-rows"></tbody>
+                </table>
+
+                <div class="stat-header">Armor & Worn Items</div>
+                <table class="bg-white">
+                    <thead>
+                        <tr><th>Description</th><th>Defense +</th><th>Weight</th></tr>
+                    </thead>
+                    <tbody id="armor-rows"></tbody>
+                </table>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="stat-box border border-black bg-white"><span class="text-[9px] font-bold">INITIATIVE</span><input id="init" value="d8+4"></div>
+                    <div class="stat-box border border-black bg-white"><span class="text-[9px] font-bold">DEFENSE</span><input id="defense" value="10/12"></div>
+                    <div class="stat-box border border-black bg-black text-white"><span class="text-[9px] font-bold">WT CARRIED</span><input id="total-wt" class="text-white" value="119.0"></div>
                 </div>
             </div>
 
-            <div class="space-y-4">
-                <div class="stat-box border-4 border-black py-6">
-                    <span class="block text-xs font-bold uppercase">Current Health</span>
-                    <input id="hp" type="number" class="text-5xl font-black text-red-700 w-full text-center" value="102">
-                </div>
-                
-                <div class="stat-header">Combat & Magic Skills (B I A E M)</div>
-                <div id="combat-skills" class="space-y-1 text-sm">
+            <div class="lg:col-span-3 space-y-6">
+                <div class="stat-header">Experience Tracker</div>
+                <div class="border-2 border-black bg-white p-2">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-black">TOTAL XP:</span>
+                        <input id="xp" class="text-xl font-black text-right w-24" value="2344">
                     </div>
-            </div>
+                    <div class="text-[9px] leading-tight grid grid-cols-2 border-t pt-2">
+                        <span>Lvl 9: 1800</span><span>Lvl 11: 2600</span>
+                        <span>Lvl 10: 2200</span><span>Lvl 12: 3000</span>
+                    </div>
+                </div>
 
-            <div class="space-y-4">
-                <div class="stat-header">Armor & Equipment</div>
-                <textarea id="gear" class="w-full h-40 border-2 border-black p-2 bg-white text-sm" placeholder="Admite Helm, Admite Armor..."></textarea>
+                <div class="stat-header">Coinage</div>
+                <table class="bg-white">
+                    <tr><th>Type</th><th>Amt</th><th>Wt</th></tr>
+                    <tr><td>P.C.</td><td><input></td><td><input class="wt-calc" value="0"></td></tr>
+                    <tr><td>G.C.</td><td><input value="37"></td><td><input class="wt-calc" value="0.5"></td></tr>
+                    <tr><td>S.C.</td><td><input value="200"></td><td><input class="wt-calc" value="0.5"></td></tr>
+                    <tr><td>C.C.</td><td><input></td><td><input class="wt-calc" value="0"></td></tr>
+                </table>
+
+                <div class="stat-header">Weight Limits</div>
+                <div class="text-[10px] p-2 bg-white border border-black space-y-1">
+                    <div class="flex justify-between"><span>Light (d10):</span><input class="w-10 font-bold" value="72"></div>
+                    <div class="flex justify-between"><span>Mod (d8):</span><input class="w-10 font-bold" value="144"></div>
+                    <div class="flex justify-between"><span>Heavy (d6):</span><input class="w-10 font-bold" value="288"></div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="border-t-4 border-black">
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            <div>
+                <div class="stat-header">Combat & General Skills (B I A E M)</div>
+                <table class="bg-white text-xs mt-2">
+                    <thead>
+                        <tr><th class="text-left px-2">Skill Name</th><th>ATB</th><th>MOD</th><th>B I A E M</th></tr>
+                    </thead>
+                    <tbody id="skill-grid"></tbody>
+                </table>
                 
-                <div class="stat-header">Role Traits & Info</div>
-                <textarea id="traits" class="w-full h-64 border-2 border-black p-2 bg-white text-xs leading-tight" placeholder="Battle Awareness, FS Guardian..."></textarea>
+                <div class="stat-header mt-6">Equipment & Gear</div>
+                <table class="bg-white">
+                    <thead><tr><th>Item</th><th>Wt</th></tr></thead>
+                    <tbody id="equip-grid"></tbody>
+                </table>
             </div>
 
+            <div class="space-y-6">
+                <div>
+                    <div class="stat-header">Racial & Social Background</div>
+                    <textarea id="background" class="w-full h-40 border-2 border-black p-3 bg-white text-sm" placeholder="Family line, origin, social standing..."></textarea>
+                </div>
+                <div>
+                    <div class="stat-header">Role Traits & Special Information</div>
+                    <textarea id="traits" class="w-full h-96 border-2 border-black p-3 bg-white text-xs leading-relaxed font-mono" placeholder="1: Battle Awareness (+4 Init)..."></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="border-2 border-black p-2 bg-white">
+                        <label class="text-[10px] font-black">DEITY / RELIGION</label>
+                        <input id="deity" class="w-full font-bold" value="Anram">
+                    </div>
+                    <div class="border-2 border-black p-2 bg-white">
+                        <label class="text-[10px] font-black">FOLLOWERS</label>
+                        <input id="followers" class="w-full font-bold" value="0">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         const attributes = [
-            { name: "Strength", id: "str" },
-            { name: "Reflexes", id: "ref" },
-            { name: "Health", id: "hea" },
-            { name: "Intellect", id: "int" },
-            { name: "Wisdom", id: "wis" },
-            { name: "Charisma", id: "cha" }
+            { name: "Strength", val: 23 },
+            { name: "Reflexes", val: 17 },
+            { name: "Health", val: 21 },
+            { name: "Intellect", val: 10 },
+            { name: "Wisdom", val: 10 },
+            { name: "Charisma", val: 10 }
         ];
 
-        const skills = ["Blade", "Sword", "Shield", "Brawl", "Lift", "Jump", "Alert", "First Aid"];
+        const skills = ["Blade", "Sword", "Shield", "Brawl", "Lift", "Jump", "Alert", "First Aid", "Listen", "Blacksmith", "Balance", "Resist Inj"];
 
         function init() {
             // Render Attributes
-            const attrContainer = document.getElementById('attr-list');
+            const attrBox = document.getElementById('attribute-box');
             attributes.forEach(a => {
-                attrContainer.innerHTML += `
-                    <div class="flex items-center justify-between bg-white border border-gray-300 p-1 px-3 rounded">
-                        <span class="font-bold text-sm uppercase">${a.name}</span>
-                        <input id="${a.id}" type="number" class="w-12 text-center font-bold text-xl" value="10" oninput="updateMod('${a.id}')">
-                        <div id="${a.id}Mod" class="w-10 font-black text-blue-700 text-center">+0</div>
-                    </div>
-                `;
+                const mod = Math.floor((a.val - 10) / 2);
+                attrBox.innerHTML += `
+                    <div class="flex items-center justify-between bg-white border border-black p-1 px-3">
+                        <span class="font-black text-[10px] uppercase">${a.name}</span>
+                        <input class="w-12 text-xl font-black text-center" value="${a.val}">
+                        <span class="text-blue-800 font-black">+${mod}</span>
+                    </div>`;
             });
 
-            // Render Skills
-            const skillContainer = document.getElementById('combat-skills');
+            // Render Skill Rows
+            const skillGrid = document.getElementById('skill-grid');
             skills.forEach(s => {
-                skillContainer.innerHTML += `
-                    <div class="flex items-center justify-between border-b border-gray-300 py-1 bg-white px-2">
-                        <span class="font-bold text-xs truncate w-20">${s}</span>
-                        <div class="flex gap-1">
-                            ${[1,2,3,4,5].map(i => `<input type="checkbox" class="w-3 h-3">`).join('')}
-                        </div>
-                        <input type="number" class="w-8 text-center font-bold text-xs" placeholder="0">
-                    </div>
-                `;
+                skillGrid.innerHTML += `
+                    <tr>
+                        <td class="text-left font-bold px-2">${s}</td>
+                        <td class="w-10"><input class="w-full"></td>
+                        <td class="w-10"><input class="w-full"></td>
+                        <td class="w-32">
+                            <div class="biaem-group">
+                                ${[1,2,3,4,5].map(() => `<div class="dot" onclick="this.classList.toggle('filled')"></div>`).join('')}
+                            </div>
+                        </td>
+                    </tr>`;
             });
 
-            loadCharacter();
+            // Rows for tables
+            fill('weapon-rows', 6, 5);
+            fill('armor-rows', 4, 3);
+            fill('equip-grid', 15, 2);
+
+            loadVault();
         }
 
-        function updateMod(id) {
-            const val = document.getElementById(id).value;
-            const mod = Math.floor((val - 10) / 2);
-            document.getElementById(id + 'Mod').innerText = (mod >= 0 ? '+' : '') + mod;
+        function fill(id, r, c) {
+            const b = document.getElementById(id);
+            for(let i=0; i<r; i++) {
+                let row = '<tr>';
+                for(let j=0; j<c; j++) row += `<td><input class="w-full ${j===c-1 ? 'wt-calc' : ''}" oninput="calcTotalWt()"></td>`;
+                b.innerHTML += row + '</tr>';
+            }
         }
 
-        function generateRandom() {
-            attributes.forEach(a => {
-                const roll = Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6) + 3;
-                document.getElementById(a.id).value = roll;
-                updateMod(a.id);
-            });
-            document.getElementById('hp').value = Math.floor(Math.random() * 50) + 50;
+        function calcTotalWt() {
+            let total = 0;
+            document.querySelectorAll('.wt-calc').forEach(i => total += parseFloat(i.value || 0));
+            document.getElementById('total-wt').value = total.toFixed(1);
         }
 
-        function saveCharacter() {
-            const data = {};
-            const inputs = document.querySelectorAll('input, textarea');
-            inputs.forEach(input => {
-                if (input.type === 'checkbox') {
-                    // Logic to save checkboxes can be added here
-                } else {
-                    data[input.id] = input.value;
-                }
-            });
-            localStorage.setItem('auros_character_data', JSON.stringify(data));
-            alert("Character Saved to Browser Cache!");
+        function saveVault() {
+            const inputs = Array.from(document.querySelectorAll('input, textarea')).map(i => i.value);
+            const dots = Array.from(document.querySelectorAll('.dot')).map(d => d.classList.contains('filled'));
+            localStorage.setItem('auros_vault_final', JSON.stringify({inputs, dots}));
+            alert("Vault Synchronized!");
         }
 
-        function loadCharacter() {
-            const saved = localStorage.getItem('auros_character_data');
-            if (!saved) return;
-            const data = JSON.parse(saved);
-            Object.keys(data).forEach(key => {
-                const el = document.getElementById(key);
-                if (el) {
-                    el.value = data[key];
-                    if (attributes.some(a => a.id === key)) updateMod(key);
-                }
-            });
+        function loadVault() {
+            const data = JSON.parse(localStorage.getItem('auros_vault_final'));
+            if (!data) return;
+            document.querySelectorAll('input, textarea').forEach((el, i) => el.value = data.inputs[i] || '');
+            document.querySelectorAll('.dot').forEach((el, i) => { if(data.dots[i]) el.classList.add('filled'); });
         }
 
-        init();
+        window.onload = init;
     </script>
 </body>
 </html>
