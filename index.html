@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auros Character Vault</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #1a1a1a; font-family: 'Georgia', serif; }
+        .parchment { background: #fdf6e3; border: 8px double #2d2d2d; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .stat-box { border: 2px solid #000; text-align: center; padding: 5px; background: white; }
+        input[type="text"], input[type="number"] { border-bottom: 1px solid #000; background: transparent; width: 100%; }
+        input:focus { outline: none; background: #fffbeb; }
+        .biam-grid span { font-size: 0.6rem; font-weight: bold; }
+    </style>
+</head>
+<body class="p-2 md:p-6">
+    <div class="max-w-4xl mx-auto parchment p-4 md:p-8">
+        
+        <div class="flex flex-wrap gap-2 mb-6 justify-center border-b-2 border-black pb-4">
+            <button onclick="generateRandom()" class="bg-indigo-700 text-white px-4 py-2 rounded font-bold text-sm">🎲 GENERATE NEW</button>
+            <button onclick="saveCharacter()" class="bg-green-700 text-white px-4 py-2 rounded font-bold text-sm">💾 SAVE TO DEVICE</button>
+            <button onclick="clearForm()" class="bg-red-700 text-white px-4 py-2 rounded font-bold text-sm">🧹 CLEAR FORM</button>
+        </div>
+
+        <h1 class="text-3xl font-black text-center mb-6 tracking-widest">LEGENDS OF AUROS</h1>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div><label class="block text-xs font-bold uppercase">Name</label><input id="name" type="text" placeholder="Xarrus"></div>
+            <div><label class="block text-xs font-bold uppercase">Race/Ancestry</label><input id="race" type="text" placeholder="Dwarf/Ailguard"></div>
+            <div><label class="block text-xs font-bold uppercase">Role</label><input id="role" type="text" placeholder="Warrior"></div>
+            <div><label class="block text-xs font-bold uppercase">Level</label><input id="level" type="number" value="10"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <div class="space-y-4">
+                <div class="bg-black text-white text-center text-xs py-1 font-bold">ATTRIBUTES</div>
+                
+                <div id="attr-container" class="space-y-2">
+                    </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="stat-box">
+                    <span class="text-xs font-bold uppercase">Health (Current/Max)</span>
+                    <div class="flex items-center justify-center gap-2">
+                        <input id="hp" type="number" class="text-3xl font-bold text-red-700 w-20" value="102">
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <span class="text-xs font-bold uppercase">Mana / Favor</span>
+                    <div class="flex gap-2">
+                        <input id="mana" type="number" class="text-xl font-bold text-blue-700" value="24">
+                        <input id="favor" type="number" class="text-xl font-bold text-yellow-700" value="18">
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <span class="text-xs font-bold uppercase">Initiative</span>
+                    <input id="init" type="text" class="text-xl font-bold" value="d8+4">
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div class="bg-black text-white text-center text-xs py-1 font-bold">WEAPONS & GEAR</div>
+                <textarea id="gear" class="w-full h-48 border border-black p-2 bg-white text-sm" placeholder="Warhammer +4 (2-12 dmg)..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const attributeNames = ["Strength", "Reflexes", "Health", "Intellect", "Wisdom", "Charisma"];
+        
+        // Initialize the UI
+        function init() {
+            const container = document.getElementById('attr-container');
+            attributeNames.forEach(attr => {
+                const id = attr.toLowerCase().substring(0, 3);
+                container.innerHTML += `
+                    <div class="flex items-center justify-between border-b border-gray-400 pb-1">
+                        <span class="font-bold text-sm uppercase w-20">${attr}</span>
+                        <input id="${id}" type="number" class="w-12 font-bold text-lg text-center" oninput="updateMod('${id}')">
+                        <div id="${id}Mod" class="w-10 font-bold text-blue-800 text-center">+0</div>
+                    </div>
+                `;
+            });
+            loadFromDevice();
+        }
+
+        function updateMod(id) {
+            const val = document.getElementById(id).value;
+            // D&D Rule Set: Floor((Score - 10) / 2)
+            const mod = Math.floor((val - 10) / 2);
+            document.getElementById(id + 'Mod').innerText = (mod >= 0 ? '+' : '') + mod;
+        }
+
+        function generateRandom() {
+            attributeNames.forEach(attr => {
+                const id = attr.toLowerCase().substring(0, 3);
+                // 4d6 Drop Lowest logic
+                let rolls = Array.from({length: 4}, () => Math.floor(Math.random() * 6) + 1);
+                rolls.sort((a,b) => b-a);
+                const result = rolls[0] + rolls[1] + rolls[2];
+                document.getElementById(id).value = result;
+                updateMod(id);
+            });
+            // Random Name/Race placeholder logic could go here
+            document.getElementById('hp').value = 20 + Math.floor(Math.random() * 80);
+        }
+
+        function saveCharacter() {
+            const data = {};
+            const fields = ['name', 'race', 'role', 'level', 'hp', 'mana', 'favor', 'init', 'gear'];
+            fields.forEach(f => data[f] = document.getElementById(f).value);
+            attributeNames.forEach(a => {
+                const id = a.toLowerCase().substring(0, 3);
+                data[id] = document.getElementById(id).value;
+            });
+            
+            localStorage.setItem('auros_save', JSON.stringify(data));
+            alert("✨ Character stored in browser memory!");
+        }
+
+        function loadFromDevice() {
+            const saved = localStorage.getItem('auros_save');
+            if (!saved) return;
+            const data = JSON.parse(saved);
+            Object.keys(data).forEach(key => {
+                const el = document.getElementById(key);
+                if (el) {
+                    el.value = data[key];
+                    if (attributeNames.some(a => a.toLowerCase().substring(0,3) === key)) {
+                        updateMod(key);
+                    }
+                }
+            });
+        }
+
+        function clearForm() {
+            if(confirm("Erase all current data?")) {
+                const inputs = document.querySelectorAll('input, textarea');
+                inputs.forEach(i => i.value = "");
+                attributeNames.forEach(a => updateMod(a.toLowerCase().substring(0,3)));
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
